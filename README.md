@@ -39,7 +39,7 @@ BaseBundle.bundle
  folder.
 
 ## Dependencies
-[AssetsTools](https://github.com/Perfare/AssetStudio) by [Prefare](https://github.com/Perfare)
+[AssetsTools.Net](https://github.com/nesrak1/AssetsTools.NET) by [nesrak1](https://github.com/nesrak1)
 You need to have the binaries in the extern folder.
 
 SixLabors ImageSharp. You can install it using NuGet.
