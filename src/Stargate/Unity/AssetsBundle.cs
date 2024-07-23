@@ -140,7 +140,7 @@ namespace Unity
         /// <param name="AtlasTags">The atlas tags.</param>
         /// <param name="AtlasID">The PathId of the atlas.</param>
         /// <returns>The PathId of the created sprite.</returns>
-        internal long MakeSprite(string filePath, long TextureID, string[] AtlasTags, long AtlasID)
+        internal long MakeSprite(string filePath, long TextureID, string[] AtlasTags, long AtlasID, Rectf? rect = null)
         {
             try
             {
@@ -171,7 +171,13 @@ namespace Unity
 
                 baseField["m_SpriteAtlas.m_PathID"].AsLong = AtlasID;
                 baseField["m_RD.texture.m_PathID"].AsLong = TextureID;
-
+                if (rect != null) {
+                    baseField["m_RD.textureRect.x"].AsFloat = rect.x;
+                    baseField["m_RD.textureRect.y"].AsFloat = rect.y;
+                    baseField["m_RD.textureRect.width"].AsFloat = rect.width;
+                    baseField["m_RD.textureRect.height"].AsFloat = rect.height;
+                }
+                
                 Replacers.Add(new AssetsReplacerFromMemory(0, PathId, ttType.TypeId, 0xffff, baseField.WriteToByteArray()));
                 PathIds.Add(PathId);
                 return PathId;
