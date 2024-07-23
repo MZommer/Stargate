@@ -159,11 +159,6 @@ namespace JDNext
                 atlases.Add(WriteTextureFromMemory(atlas, $"sactx-{i}-{atlasSize.Height}x{atlasSize.Width}-Crunch-{mapName}"));
             }
             Dictionary<string, long> pictosPathIds = new();
-            // make sprites of atlas
-            foreach (KeyValuePair<string, Tuple<int, int, int>> entry in pictosMap){
-                pictosPathIds[entry.Key] = MakeSprite(entry.Key, atlases[entry.Value.Item3], new string[] { mapName }, atlasId);
-            }
-
 
             foreach (AssetFileInfo file in assetsFile.GetAssetsOfType(AssetClassID.SpriteAtlas))
             {
@@ -171,6 +166,45 @@ namespace JDNext
 
                 atlas["m_Name"].AsString = mapName;
                 atlas["m_Tag"].AsString = mapName;
+
+                var renderDataMap = atlas["m_RenderDataMap.Array"];
+                renderDataMap.Children.Clear();
+                foreach (var kv in pictosMap)
+                {
+                    Rectf rect = new()
+                    {
+                        x = (float)kv.Value.Item1,
+                        y = (float)(pictoSize.Height - kv.Value.Item2),
+                        // because of the flipping of the texture, we need to flip the rect as well
+                        width = (float)pictoSize.Width,
+                        height = (float)pictoSize.Height
+                    };
+
+                    pictosPathIds[kv.Key] = MakeSprite(kv.Key, atlases[kv.Value.Item3], new string[] { mapName }, atlasId, rect);
+            
+                    var pathId = atlases[kv.Value.Item3];
+                    var name = kv.Key;
+                    var data = ValueBuilder.DefaultValueFieldFromArrayTemplate(renderDataMap);
+                    data["first.first.data[0]"].AsUInt = (uint)GUID_Map[name][0];
+                    data["first.first.data[1]"].AsUInt = (uint)GUID_Map[name][1];
+                    data["first.first.data[2]"].AsUInt = (uint)GUID_Map[name][2];
+                    data["first.first.data[3]"].AsUInt = (uint)GUID_Map[name][3];
+                    data["first.second"].AsLong = 21300000;
+                    data["second"]["texture"]["m_PathID"].AsLong = pathId;
+                    data["second.textureRect.x"].AsFloat = rect.x;
+                    data["second.textureRect.y"].AsFloat =  rect.y;
+                    data["second.textureRect.width"].AsFloat = rect.width;
+                    data["second.textureRect.height"].AsFloat = rect.height;
+                    data["second.atlasRectOffset.x"].AsFloat = -1f;
+                    data["second.atlasRectOffset.x"].AsFloat = -1f;
+                    data["second.uvTransform.x"].AsFloat = 100f;
+                    data["second.uvTransform.y"].AsFloat = 256f;
+                    data["second.uvTransform.z"].AsFloat = 100f;
+                    data["second.uvTransform.w"].AsFloat = 256f;
+                    data["second.downscaleMultiplier"].AsFloat = 1f;
+                    data["second.settingsRaw"].AsUInt = 3;
+                    renderDataMap.Children.Add(data);
+                }
 
                 var packedSprites = atlas["m_PackedSprites.Array"];
                 packedSprites.Children.Clear();
@@ -187,35 +221,6 @@ namespace JDNext
                     var data = ValueBuilder.DefaultValueFieldFromArrayTemplate(namesToIndex);
                     data.AsString = picto;
                     namesToIndex.Children.Add(data);
-                }
-
-                var renderDataMap = atlas["m_RenderDataMap.Array"];
-                renderDataMap.Children.Clear();
-                foreach (var kv in pictosMap)
-                {
-                    var pathId = atlases[kv.Value.Item3];
-                    var name = kv.Key;
-                    var data = ValueBuilder.DefaultValueFieldFromArrayTemplate(renderDataMap);
-                    data["first.first.data[0]"].AsUInt = (uint)GUID_Map[name][0];
-                    data["first.first.data[1]"].AsUInt = (uint)GUID_Map[name][1];
-                    data["first.first.data[2]"].AsUInt = (uint)GUID_Map[name][2];
-                    data["first.first.data[3]"].AsUInt = (uint)GUID_Map[name][3];
-                    data["first.second"].AsLong = 21300000;
-                    data["second"]["texture"]["m_PathID"].AsLong = pathId;
-                    data["second.textureRect.x"].AsFloat = kv.Value.Item1;
-                    data["second.textureRect.y"].AsFloat = pictoSize.Height - kv.Value.Item2;
-                    // because of the flipping of the texture, we need to flip the rect as well
-                    data["second.textureRect.width"].AsFloat = 512f;
-                    data["second.textureRect.height"].AsFloat = 512f;
-                    data["second.atlasRectOffset.x"].AsFloat = -1f;
-                    data["second.atlasRectOffset.x"].AsFloat = -1f;
-                    data["second.uvTransform.x"].AsFloat = 100f;
-                    data["second.uvTransform.y"].AsFloat = 256f;
-                    data["second.uvTransform.z"].AsFloat = 100f;
-                    data["second.uvTransform.w"].AsFloat = 256f;
-                    data["second.downscaleMultiplier"].AsFloat = 1f;
-                    data["second.settingsRaw"].AsUInt = 3;
-                    renderDataMap.Children.Add(data);
                 }
 
                 Replacers.Add(new AssetsReplacerFromMemory(assetsFile, file, atlas));
