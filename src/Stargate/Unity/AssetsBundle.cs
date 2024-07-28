@@ -172,6 +172,11 @@ namespace Unity
                 baseField["m_SpriteAtlas.m_PathID"].AsLong = AtlasID;
                 baseField["m_RD.texture.m_PathID"].AsLong = TextureID;
                 if (rect != null) {
+                    baseField["m_Rect.x"].AsFloat = rect.x;
+                    baseField["m_Rect.y"].AsFloat = rect.y;
+                    baseField["m_Rect.width"].AsFloat = rect.width;
+                    baseField["m_Rect.height"].AsFloat = rect.height;
+                
                     baseField["m_RD.textureRect.x"].AsFloat = rect.x;
                     baseField["m_RD.textureRect.y"].AsFloat = rect.y;
                     baseField["m_RD.textureRect.width"].AsFloat = rect.width;
