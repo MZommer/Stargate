@@ -131,6 +131,7 @@ namespace JDNext
             var atlasSize = new Size(1024, 1024);
             var sample = Image.Load<Bgra32>(pictos.First());
             var pictoSize = new Size(sample.Width, sample.Height);
+            atlasSize = pictoSize; // While we implement dtx textures
             var pictosPerAtlas = Math.Ceiling((double) (atlasSize.Width * atlasSize.Height) / (pictoSize.Width * pictoSize.Height));
             var atlasCount = (int)Math.Ceiling(pictos.Count() / pictosPerAtlas);
 
@@ -174,7 +175,7 @@ namespace JDNext
                     Rectf rect = new()
                     {
                         x = (float)kv.Value.Item1,
-                        y = (float)(pictoSize.Height - kv.Value.Item2),
+                        y = (float)(/*pictoSize.Height -*/ kv.Value.Item2),
                         // because of the flipping of the texture, we need to flip the rect as well
                         width = (float)pictoSize.Width,
                         height = (float)pictoSize.Height
