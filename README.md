@@ -56,5 +56,3 @@ Contributions are welcome! Please open an issue or submit a pull request on the 
 
 ## License
 This project is licensed under the GNU License.
-
-Thanks to yunyl for some help.
